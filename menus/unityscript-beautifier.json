@@ -1,0 +1,26 @@
+{
+  "context-menu": {
+    "atom-text-editor": [
+      {
+        "label": "UnityScript Beautify",
+        "command": "unityscript-beautifier:beautify"
+      }
+    ]
+  },
+  "menu": [
+    {
+      "label": "Packages",
+      "submenu": [
+        {
+          "label": "Unityscript Beautifier",
+          "submenu": [
+            {
+              "label": "UnityScript Beautify",
+              "command": "unityscript-beautifier:beautify"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

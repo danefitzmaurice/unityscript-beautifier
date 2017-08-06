@@ -1,0 +1,13 @@
+{
+  "name": "unityscript-beautifier",
+  "main": "./lib/unityscript-beautifier",
+  "version": "0.0.0",
+  "description": "A javascript beautifier with UnityScript syntax support.",
+  "keywords": [],
+  "repository": "https://github.com/danefitzmaurice/unityscript-beautifier.git",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "dependencies": {}
+}
