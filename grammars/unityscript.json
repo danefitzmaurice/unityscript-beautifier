@@ -1,0 +1,829 @@
+{
+  "scopeName": "source.unityscript",
+  "name": "UnityScript",
+  "fileTypes": ["js"],
+  "firstLineMatch": "^//.*\\b(unityscript)",
+  "patterns": [
+    {
+      "begin": "(?<!\\.)\\b(import)(?!\\s*:)\\b",
+      "beginCaptures": {
+        "1": {
+          "name": "keyword.control.unityscript"
+        }
+      },
+      "patterns": [
+        {
+          "match": "\\*",
+          "name": "variable.language.import-all.unityscript"
+        }, {
+          "include": "#strings"
+        }, {
+          "include": "#comments"
+        }, {
+          "match": ",",
+          "name": "meta.delimiter.object.comma.unityscript"
+        }
+      ],
+      "end": "(?=;|$)",
+      "name": "meta.import.unityscript"
+    }, {
+      "match": "(?<!\\.)\\b(super|this)(?!\\s*:)\\b|(?<=\\?)(?:\\s*)(super|this)(?=\\s*:)",
+      "captures": {
+        "1": {
+          "name": "variable.language.unityscript"
+        },
+        "2": {
+          "name": "variable.language.unityscript"
+        }
+      }
+    }, {
+      "begin": "(?=\\b(constructor)\\s*)",
+      "end": "(?<=})",
+      "patterns": [
+        {
+          "include": "#comments"
+        }, {
+          "include": "#function_body"
+        }, {
+          "begin": "\\G",
+          "end": "(?<=\\))",
+          "name": "meta.function.unityscript",
+          "patterns": [
+            {
+              "match": "\\b(constructor)\\s*",
+              "name": "entity.name.function.constructor.unityscript"
+            }, {
+              "include": "#function_innards"
+            }
+          ]
+        }
+      ]
+    }, {
+      "begin": "(?x)\n(?=\n  (?!\n    (break|case|catch|continue|do|else|finally|for|function|if|export|\n    import|package|return|switch|throw|try|while|with)\n    [\\s\\(]\n  )\n  \\b[a-zA-Z_$][\\w$]*\n  \\s*\\(\\s*\n     ((\"[^\"]*\")|(\\'[^\\']*\\')|((?!\"|\\'|\\(|\\)).))*\n  \\)\\s*\\{\n)",
+      "end": "(?<=})",
+      "patterns": [
+        {
+          "include": "#comments"
+        }, {
+          "include": "#function_body"
+        }, {
+          "begin": "\\G",
+          "end": "(?<=\\))",
+          "name": "meta.function.method.definition.unityscript",
+          "patterns": [
+            {
+              "match": "\\b([a-zA-Z_$][\\w$]*)",
+              "name": "entity.name.function.unityscript"
+            }, {
+              "include": "#function_params"
+            }
+          ]
+        }
+      ]
+    }, {
+      "begin": "(?x)\n(?=\n  (?<![A-Za-z0-9])\n  ((\\(([^\\(\\)]*)?\\))|[\\w$]+)\n  \\s*=>\n)",
+      "end": "(?x)\n(?<=})|\n((?!\n  \\s*{|\n  \\G\\(|\n  \\G[\\w$]+|\n  \\s*/\\*|\\s*//\n)(?=\\s*\\S))",
+      "patterns": [
+        {
+          "include": "#comments"
+        }, {
+          "include": "#function_body"
+        }, {
+          "begin": "\\G",
+          "end": "(?<=(=>))",
+          "name": "meta.function.arrow.unityscript",
+          "patterns": [
+            {
+              "include": "#arrow_function_innards"
+            }
+          ]
+        }
+      ]
+    }, {
+      "match": "(?x)\n\\b(class)\n(?:\n  (?:\\s+(extends)\\s+([a-zA-Z_$][\\w$]*))\n  |\n  (?:\n    (?:\\s+([a-zA-Z_$][\\w$]*))\n    (?:\\s+(extends)\\s+([a-zA-Z_$][\\w$]*))?\n  )\n)",
+      "captures": {
+        "1": {
+          "name": "storage.type.class.unityscript"
+        },
+        "2": {
+          "name": "storage.modifier.unityscript"
+        },
+        "3": {
+          "name": "entity.other.inherited-class.unityscript"
+        },
+        "4": {
+          "name": "entity.name.type.class.unityscript"
+        },
+        "5": {
+          "name": "storage.modifier.unityscript"
+        },
+        "6": {
+          "name": "entity.other.inherited-class.unityscript"
+        }
+      },
+      "name": "meta.class.unityscript"
+    }, {
+      "captures": {
+        "1": {
+          "name": "keyword.operator.new.unityscript"
+        },
+        "2": {
+          "name": "entity.name.type.instance.unityscript"
+        }
+      },
+      "match": "(new)\\s+(\\$?\\w+(?:\\.\\w*)?)",
+      "name": "meta.class.instance.constructor"
+    }, {
+      "begin": "(?<![\\w$])Debug(?![\\w$]|\\s*:)",
+      "beginCaptures": {
+        "0": {
+          "name": "entity.name.type.object.console.unityscript"
+        }
+      },
+      "end": "(?x)\n(?<=\\)) | (?=\n  (?! (\\s*//)|(\\s*/\\*)|(\\s*(\\.)\\s*\n    (Log|LogError|LogWarning|Assert|Break)\n    \\s*\\(\n  )) \\s*\\S\n)",
+      "patterns": [
+        {
+          "include": "#comments"
+        }, {
+          "begin": "\\s*(\\.)\\s*(\\w+)\\s*(?=\\()",
+          "beginCaptures": {
+            "1": {
+              "name": "meta.delimiter.method.period.unityscript"
+            },
+            "2": {
+              "name": "support.function.console.unityscript"
+            }
+          },
+          "end": "(?<=\\))",
+          "name": "meta.method-call.unityscript",
+          "patterns": [
+            {
+              "include": "#arguments"
+            }
+          ]
+        }
+      ]
+    }, {
+      "begin": "(?<![\\w$])Mathf(?![\\w$]|\\s*:)",
+      "beginCaptures": {
+        "0": {
+          "name": "support.class.math.unityscript"
+        }
+      },
+      "end": "(?x)\n(?<=E|LN10|LN2|LOG10E|LOG2E|PI|SQRT1_2|SQRT2|\\)\n) | (?=\n  (?! (\\s*//)|(\\s*/\\*)|(\\s*\\.\\s* (\n    ((Abs|Acos|Approximately|Asin|Atan|Atan2|Ceil|CeilToInt|Clamp|Clamp01|Cos|DeltaAngle|Exp|\n    Floor|FloorToInt|GammaToLinearSpace|InverseLerp|IsPowerOfTwo|Lerp|LerpAngle|LerpUnclamped|\n    LinearToGammaSpace|Log|Log10|Max|Min|MoveTowards|MoveTowardsAngle|NextPowerOfTwo|PerlinNoise|\n    PingPong|Pow|Repeat|Round|RoundToInt|Round|Sign|Sin|SmoothDamp|SmoothDampAngle|SmoothStep|\n    Sqrt|Tan)\\s*\\(\n    ) | (E|LN10|LN2|LOG10E|LOG2E|PI|SQRT1_2|SQRT2)(?!\\s*[\\w$(]))\n  )) \\s*\\S\n)",
+      "patterns": [
+        {
+          "include": "#comments"
+        }, {
+          "begin": "\\s*(\\.)\\s*(\\w+)\\s*(?=\\()",
+          "beginCaptures": {
+            "1": {
+              "name": "meta.delimiter.method.period.unityscript"
+            },
+            "2": {
+              "name": "support.function.math.unityscript"
+            }
+          },
+          "end": "(?<=\\))",
+          "name": "meta.method-call.unityscript",
+          "patterns": [
+            {
+              "include": "#arguments"
+            }
+          ]
+        }, {
+          "match": "\\s*(\\.)\\s*(\\w+)\\b",
+          "captures": {
+            "1": {
+              "name": "meta.delimiter.property.period.unityscript"
+            },
+            "2": {
+              "name": "support.constant.property.math.unityscript"
+            }
+          }
+        }
+      ]
+    }, {
+      "include": "#strings"
+    }, {
+      "include": "#comments"
+    }, {
+      "match": "(?<!\\.)\\b(class|enum|function|interface|string|char|int|float|double|long|boolean)(?!\\s*:)\\b",
+      "name": "storage.type.unityscript"
+    }, {
+      "match": "(?<!\\.)\\b(extends|implements|private|protected|public|static)(?!\\s*:)\\b",
+      "name": "storage.modifier.unityscript"
+    }, {
+      "match": "(?<!\\.)\\b(var)(?!\\s*:)\\b",
+      "name": "storage.type.var.unityscript"
+    }, {
+      "begin": "(?<!\\.)\\b(const)(?!\\s*:)\\b",
+      "beginCaptures": {
+        "1": {
+          "name": "storage.modifier.unityscript"
+        }
+      },
+      "end": "(\\bof\\b|\\bin\\b)|(;)|(=)|(?<![,{])\\n",
+      "endCaptures": {
+        "1": {
+          "name": "keyword.operator.$1.unityscript"
+        },
+        "2": {
+          "name": "punctuation.terminator.statement.unityscript"
+        },
+        "3": {
+          "name": "keyword.operator.assignment.unityscript"
+        }
+      },
+      "patterns": [
+        {
+          "match": "([$_a-zA-Z][$_a-zA-Z0-9]*)\\s*(:)\\s*([$_a-zA-Z][$_a-zA-Z0-9]*)?",
+          "captures": {
+            "2": {
+              "name": "keyword.operator.assignment.unityscript"
+            },
+            "3": {
+              "name": "constant.other.unityscript"
+            }
+          }
+        }, {
+          "match": "([$_a-zA-Z][$_a-zA-Z0-9]*)",
+          "captures": {
+            "1": {
+              "name": "constant.other.unityscript"
+            }
+          }
+        }, {
+          "match": "\\.\\.\\.",
+          "name": "keyword.operator.spread.unityscript"
+        }, {
+          "match": ",",
+          "name": "meta.delimiter.object.comma.unityscript"
+        }, {
+          "match": "\\(|\\)",
+          "name": "meta.brace.round.unityscript"
+        }, {
+          "match": "{|}",
+          "name": "meta.brace.curly.unityscript"
+        }, {
+          "match": "\\[|\\]",
+          "name": "meta.brace.square.unityscript"
+        }, {
+          "include": "#comments"
+        }
+      ]
+    }, {
+      "match": "(?<!\\.)\\b(yield)(?!\\s*:)\\b(?:\\s*(\\*))?|(?<=\\?)(?:\\s*)(yield)(?=\\s*:)",
+      "captures": {
+        "1": {
+          "name": "keyword.control.unityscript"
+        },
+        "2": {
+          "name": "storage.modifier.unityscript"
+        },
+        "3": {
+          "name": "keyword.control.unityscript"
+        },
+        "4": {
+          "name": "storage.modifier.unityscript"
+        }
+      },
+      "name": "meta.control.yield.unityscript"
+    }, {
+      "match": "(?<!\\.)\\b(break|case|catch|continue|do|else|finally|for|if|import|from|package|return|switch|throw|try|while|with)(?!\\s*:)\\b",
+      "name": "keyword.control.unityscript"
+    }, {
+      "match": "(?<!\\.)\\b(delete|in|of|instanceof|new|typeof|transform|gameObject)(?!\\s*:)\\b",
+      "name": "keyword.operator.$1.unityscript"
+    }, {
+      "match": "\\.\\.\\.",
+      "name": "keyword.operator.spread.unityscript"
+    }, {
+      "match": "(?<!\\.)\\b(true|false)(?!\\s*:)\\b|(?<=\\?)(?:\\s*)(true|false)(?=\\s*:)",
+      "captures": {
+        "1": {
+          "name": "constant.language.boolean.$1.unityscript"
+        },
+        "2": {
+          "name": "constant.language.boolean.$2.unityscript"
+        }
+      }
+    }, {
+      "match": "(?<!\\.)\\b(null)(?!\\s*:)\\b|(?<=\\?)(?:\\s*)(null)(?=\\s*:)",
+      "captures": {
+        "1": {
+          "name": "constant.language.null.unityscript"
+        },
+        "2": {
+          "name": "constant.language.null.unityscript"
+        }
+      }
+    }, {
+      "match": "(?<!\\$)\\b(Array|Hashtable|NonSerializable|Path|Serializable|String|VisionUtility|Advertisement|DebugLevel|MetaData|ShowOptions|PlacementState|ShowResult|NavMesh|NavMeshAgent|NavMeshBuildDebugSettings|NavMeshBuilder|NavMeshBuildMarkup|NavMeshBuildSettings|NavMeshBuildSource|NavMeshData|NavMeshDataInstance|NavMeshHit|NavMeshLinkData|NavMeshLinkInstance|NavMeshObstacle|NavMeshPath|NavMeshQueryFilter|NavMeshTriangulation|OffMeshLink|OffMeshLinkData|NavMeshBuildDebugFlags|NavMeshBuildSourceShape|NavMeshCollectGeometry|NavMeshObstacleShape|NavMeshPathStatus|ObstacleAvoidanceType|OffMeshLinkType|Analytics|AnalyticsSessionInfo|AnalyticsTracker|PerformanceReporting|AnalyticsResult|AnalyticsSessionState|Gender|AnimationClipPlayable|AnimationLayerMixerPlayable|AnimationMixerPlayable|AnimationPlayableOutput|AnimatorControllerPlayable|ReplayKit|Remote|FloatComparer|MustExtensions|Assert|AssertionException|AudioClipPlayable|AudioMixer|AudioMixerGroup|AudioMixerPlayable|AudioMixerSnapshot|AudioPlayableOutput|AudioSpatializerMicrosoft|RoomSize|AudioMixerUpdateMode|CrashReportHandler|UnityEvent|UnityEvent<T0>|UnityEvent<T0,T1>|UnityEvent<T0,T1,T2>|UnityEvent<T0,T1,T2,T3>|UnityEventBase|PersistentListenerMode|UnityEventCallState|AbstractEventData|AxisEventData|BaseEventData|BaseInput|BaseInputModule|BaseRaycaster|EventSystem|EventTrigger|Entry|TriggerEvent|ExecuteEvents|HoloLensInputModule|Physics2DRaycaster|PhysicsRaycaster|PointerEventData|FramePressState|InputButton|PointerInputModule|MouseButtonEventData|RaycastResult|StandaloneInputModule|TouchInputModule|UIBehaviour|IBeginDragHandler|ICancelHandler|IDeselectHandler|IDragHandler|IDropHandler|IEndDragHandler|IEventSystemHandler|IInitializePotentialDragHandler|IMoveHandler|IPointerClickHandler|IPointerDownHandler|IPointerEnterHandler|IPointerExitHandler|IPointerUpHandler|IScrollHandler|ISelectHandler|ISubmitHandler|IUpdateSelectedHandler|EventHandle|EventTriggerType|MoveDirection|BlendState|CameraProperties|CoreCameraValues|CullResults|DepthState|DrawRendererSettings|DrawRendererSortSettings|DrawShadowsSettings|InputFilter|LODParameters|RasterState|RenderPass|SubPass|RenderPassAttachment|RenderPipeline|RenderPipelineAsset|RenderPipelineManager|RenderStateBlock|RenderStateMapping|RenderTargetBlendState|ScriptableCullingParameters|ScriptableRenderContext|ShaderPassName|ShadowSplitData|StencilState|VisibleLight|VisibleReflectionProbe|IRenderPipeline|IRenderPipelineAsset|DrawRendererFlags|ReflectionProbeSortOptions|RendererConfiguration|RenderStateMask|SortFlags|VisibleLightFlags|Align|FlexDirection|Justify|PositionType|Wrap|StyleValue<T0>|ICustomStyle|TextField|UQuery|UQuery<T0>|UQuery<T0>|UQueryExtensions|VisualElement|IStyle|PropagationPhase|ADBannerView|Layout|Type|ADInterstitialAd|Device|LocalNotification|NotificationServices|OnDemandResources|OnDemandResourcesRequest|RemoteNotification|ActivityIndicatorStyle|CalendarIdentifier|CalendarUnit|DeviceGeneration|NotificationType|MatchInfo|MatchInfoSnapshot|MatchInfoDirectConnectSnapshot|NetworkMatch|AddPlayerMessage|EmptyMessage|ErrorMessage|IntegerMessage|NotReadyMessage|PeerAuthorityMessage|PeerInfoMessage|PeerInfoPlayer|PeerListMessage|ReadyMessage|ReconnectMessage|RemovePlayerMessage|StringMessage|MessageEventArgs|PlayerConnection|NetworkAccessToken|AppID|HostPriority|NetworkAccessLevel|NetworkID|NodeID|SourceID|ChannelQOS|Channels|ClientScene|ConnectionConfig|ConnectionSimulatorConfig|DownloadHandler|DownloadHandlerAssetBundle|DownloadHandlerAudioClip|DownloadHandlerBuffer|DownloadHandlerFile|DownloadHandlerMovieTexture|DownloadHandlerScript|DownloadHandlerTexture|GlobalConfig|HostTopology|LogFilter|FilterLevel|MessageBase|MsgType|MultipartFormDataSection|MultipartFormFileSection|NetworkAnimator|NetworkBehaviour|NetworkBroadcastResult|NetworkClient|NetworkConnection|PacketStat|NetworkCRC|NetworkDiscovery|NetworkHash128|NetworkIdentity|NetworkInstanceId|NetworkLobbyManager|NetworkLobbyPlayer|NetworkManager|NetworkManagerHUD|NetworkMessage|NetworkMigrationManager|ConnectionPendingPlayers|PendingPlayerInfo|SceneChangeOption|NetworkProximityChecker|CheckMethod|NetworkReader|NetworkSceneId|NetworkServer|NetworkServerSimple|NetworkStartPosition|NetworkTransform|AxisSyncMode|CompressionSyncMode|TransformSyncMode|NetworkTransformChild|NetworkTransformVisualizer|NetworkTransport|NetworkWriter|PlayerController|SyncList<T0>|Operation|SyncListBool|SyncListFloat|SyncListInt|SyncListString|SyncListStruct<T0>|SyncListUInt|UnityWebRequest|UnityWebRequestAsyncOperation|UnityWebRequestMultimedia|UnityWebRequestTexture|UploadHandler|UploadHandlerRaw|Utility|IMultipartFormSection|ChannelOption|ConnectionAcksType|NetworkError|NetworkEventType|PlayerSpawnMethod|QosType|ReactorModel|Version|ClientAttribute|ClientCallbackAttribute|ClientRpcAttribute|CommandAttribute|NetworkSettingsAttribute|ServerAttribute|ServerCallbackAttribute|SyncEventAttribute|SyncVarAttribute|TargetRpcAttribute|AnimationPlayableUtilities|FrameData|EvaluationType|Playable|PlayableAsset|PlayableBehaviour|PlayableBinding|PlayableDirector|PlayableExtensions|PlayableGraph|PlayableOutputExtensions|ScriptPlayable<T0>|ScriptPlayableOutput|IPlayable|IPlayableAsset|IPlayableOutput|DataStreamType|DirectorUpdateMode|DirectorWrapMode|PlayState|CustomSampler|Profiler|Recorder|Sampler|AbstractPurchasingModule|AbstractStore|ProductDescription|PurchaseFailureDescription|ICatalogProvider|IPurchasingBinder|IPurchasingModule|IStore|IStoreCallback|IStoreConfiguration|ConfigurationBuilder|IDs|PayoutDefinition|Product|ProductCollection|ProductDefinition|ProductMetadata|PurchaseEventArgs|PurchaseFailedEventArgs|UnityPurchasing|IExtensionProvider|IStoreController|IStoreExtension|IStoreListener|InitializationFailureReason|PayoutType|ProductType|PurchaseFailureReason|PurchaseProcessingResult|CommandBuffer|GraphicsSettings|ReflectionProbeBlendInfo|RenderTargetIdentifier|SortingGroup|SphericalHarmonicsL2|SplashScreen|AmbientMode|BlendMode|BlendOp|BuiltinRenderTextureType|BuiltinShaderDefine|BuiltinShaderMode|BuiltinShaderType|CameraEvent|CameraHDRMode|ColorWriteMask|CompareFunction|CopyTextureSupport|CullMode|DefaultReflectionMode|GraphicsDeviceType|GraphicsTier|LightEvent|LightProbeUsage|LightShadowResolution|OpaqueSortMode|PassType|RealtimeGICPUUsage|ReflectionCubemapCompression|ReflectionProbeClearFlags|ReflectionProbeMode|ReflectionProbeRefreshMode|ReflectionProbeTimeSlicingMode|ReflectionProbeUsage|RenderBufferLoadAction|RenderBufferStoreAction|RenderQueue|ShadowCastingMode|ShadowMapPass|ShadowSamplingMode|StencilOp|TextureDimension|UVChannelFlags|Scene|SceneManager|SceneUtility|LoadSceneMode|PreserveAttribute|FormerlySerializedAsAttribute|GameCenterPlatform|Range|IAchievement|IAchievementDescription|ILeaderboard|ILocalUser|IScore|ISocialPlatform|IUserProfile|TimeScope|UserScope|UserState|TrackedPoseDriver|DeviceType|TrackedPose|TrackingType|UpdateType|DataUtility|LogAssert|MonoBehaviourTest<T0>|IMonoBehaviourTest|IPrebuildSetup|TestPlatform|PrebuildSetupAttribute|UnityPlatformAttribute|UnityTestAttribute|ITilemap|Tile|ColliderType|TileAnimationData|TileBase|TileData|Tilemap|Orientation|TilemapCollider2D|TilemapRenderer|SortOrder|TileFlags|ActivationControlPlayable|PostPlaybackState|ActivationTrack|PostPlaybackState|AnimationPlayableAsset|AnimationTrack|AudioPlayableAsset|AudioTrack|ControlPlayableAsset|ControlTrack|DirectorControlPlayable|GroupTrack|ParticleControlPlayable|PlayableTrack|PrefabControlPlayable|TimelineAsset|DurationMode|TimelineClip|ClipExtrapolation|TimelinePlayable|TrackAsset|TrackAssetExtensions|IPropertyCollector|IPropertyPreview|ITimeControl|ITimelineClipAsset|ClipCaps|NotKeyableAttribute|TrackBindingTypeAttribute|TrackClipTypeAttribute|TrackColorAttribute|Window|SpriteAtlas|SpriteAtlasManager|AnimationTriggers|AspectRatioFitter|AspectMode|BaseMeshEffect|BaseVertexEffect|Button|ButtonClickedEvent|CanvasScaler|ScaleMode|ScreenMatchMode|Unit|CanvasUpdateRegistry|ClipperRegistry|Clipping|ColorBlock|ContentSizeFitter|FitMode|DefaultControls|Resources|Dropdown|DropdownEvent|OptionData|OptionDataList|FontData|FontUpdateTracker|Graphic|GraphicRaycaster|BlockingObjects|GraphicRebuildTracker|GraphicRegistry|GridLayoutGroup|Axis|Constraint|Corner|HorizontalLayoutGroup|HorizontalOrVerticalLayoutGroup|Image|FillMethod|Origin180|Origin360|Origin90|OriginHorizontal|OriginVertical|Type|InputField|OnChangeEvent|SubmitEvent|CharacterValidation|ContentType|InputType|LineType|LayoutElement|LayoutGroup|LayoutRebuilder|LayoutUtility|Mask|MaskableGraphic|MaskUtilities|Navigation|Mode|Outline|PositionAsUV1|RawImage|RectMask2D|Scrollbar|ScrollEvent|Direction|ScrollRect|ScrollRectEvent|MovementType|ScrollbarVisibility|Selectable|SelectionState|Transition|Shadow|Slider|SliderEvent|Direction|SpriteState|Text|Toggle|ToggleEvent|ToggleTransition|ToggleGroup|VertexHelper|VerticalLayoutGroup|ICanvasElement|IClippable|IClipper|ILayoutController|ILayoutElement|ILayoutGroup|ILayoutIgnorer|ILayoutSelfController|IMask|IMaskable|IMaterialModifier|IMeshModifier|IVertexModifier|CanvasUpdate|VideoClip|VideoPlayer|VideoAspectRatio|VideoAudioOutputMode|VideoRenderMode|VideoSource|VideoTimeReference|VideoTimeSource|DictationRecognizer|GrammarRecognizer|KeywordRecognizer|PhraseRecognitionSystem|PhraseRecognizedEventArgs|PhraseRecognizer|SemanticMeaning|ConfidenceLevel|DictationCompletionCause|DictationTopicConstraint|SpeechError|SpeechSystemStatus|CrashReporting|Crypto|Directory|File|Application|Cursor|Launcher|SecondaryTileData|Tile|Toast|Folder|TileForegroundText|TileTemplate|ToastTemplate|WindowActivationState|GestureErrorEventArgs|GestureRecognizer|HoldCanceledEventArgs|HoldCompletedEventArgs|HoldStartedEventArgs|InteractionManager|InteractionSource|InteractionSourceDetectedEventArgs|InteractionSourceLocation|InteractionSourceLostEventArgs|InteractionSourcePose|InteractionSourcePressedEventArgs|InteractionSourceProperties|InteractionSourceReleasedEventArgs|InteractionSourceState|InteractionSourceUpdatedEventArgs|ManipulationCanceledEventArgs|ManipulationCompletedEventArgs|ManipulationStartedEventArgs|ManipulationUpdatedEventArgs|NavigationCanceledEventArgs|NavigationCompletedEventArgs|NavigationStartedEventArgs|NavigationUpdatedEventArgs|RecognitionEndedEventArgs|RecognitionStartedEventArgs|TappedEventArgs|GestureSettings|InteractionSourceHandedness|InteractionSourceKind|InteractionSourceNode|InteractionSourcePositionAccuracy|InteractionSourcePressType|WorldAnchorStore|WorldAnchorTransferBatch|SerializationCompletionReason|CameraParameters|PhotoCapture|PhotoCaptureResult|CaptureResultType|PhotoCaptureFrame|VideoCapture|VideoCaptureResult|AudioState|CaptureResultType|WebCam|CapturePixelFormat|PhotoCaptureFileOutputFormat|WebCamMode|HolographicSettings|SpatialMappingBase|LODType|VolumeType|SpatialMappingCollider|SpatialMappingRenderer|RenderState|SurfaceData|SurfaceId|SurfaceObserver|WorldAnchor|WorldManager|PositionalLocatorState|SurfaceChange|ARBackgroundRenderer|InputTracking|XRDevice|XRNodeState|XRSettings|XRStats|ARRenderMode|TrackingSpaceType|UserPresenceState|XRNode|AccelerationEvent|AnchoredJoint2D|AndroidInput|AndroidJavaClass|AndroidJavaObject|AndroidJavaProxy|AndroidJNI|AndroidJNIHelper|Animation|AnimationClip|AnimationClipPair|AnimationCurve|AnimationEvent|AnimationInfo|AnimationState|Animator|AnimatorClipInfo|AnimatorControllerParameter|AnimatorOverrideController|AnimatorStateInfo|AnimatorTransitionInfo|AnimatorUtility|Application|AreaEffector2D|AssetBundle|AssetBundleCreateRequest|AssetBundleManifest|AssetBundleRequest|AsyncOperation|AudioChorusFilter|AudioClip|AudioConfiguration|AudioDistortionFilter|AudioEchoFilter|AudioHighPassFilter|AudioListener|AudioLowPassFilter|AudioReverbFilter|AudioReverbZone|AudioSettings|AudioSource|Avatar|AvatarBuilder|AvatarMask|Behaviour|BillboardAsset|BillboardRenderer|BitStream|BoneWeight|BoundingSphere|Bounds|BoundsInt|PositionEnumerator|BoxCollider|BoxCollider2D|BuoyancyEffector2D|Cache|CachedAssetBundle|Caching|Camera|MonoOrStereoscopicEye|StereoscopicEye|Canvas|CanvasGroup|CanvasRenderer|CapsuleCollider|CapsuleCollider2D|CharacterController|CharacterInfo|CharacterJoint|CircleCollider2D|Cloth|ClothSkinningCoefficient|ClothSphereColliderPair|ClusterInput|ClusterNetwork|Collider|Collider2D|ColliderDistance2D|Collision|Collision2D|Color|Color32|ColorUtility|CombineInstance|Compass|Component|CompositeCollider2D|GenerationType|GeometryType|ComputeBuffer|ComputeShader|ConfigurableJoint|ConstantForce|ConstantForce2D|ContactFilter2D|ContactPoint|ContactPoint2D|ControllerColliderHit|Coroutine|CrashReport|Cubemap|CubemapArray|CullingGroup|CullingGroupEvent|Cursor|CustomRenderTexture|CustomRenderTextureUpdateZone|CustomYieldInstruction|Debug|DetailPrototype|Display|DistanceJoint2D|DrivenRectTransformTracker|DynamicGI|EdgeCollider2D|Effector2D|EllipsoidParticleEmitter|Event|ExposedPropertyResolver|ExposedReference<T0>|FixedJoint|FixedJoint2D|Flare|FlareLayer|Font|FrictionJoint2D|FrustumPlanes|GameObject|GeometryUtility|Gizmos|GL|Gradient|GradientAlphaKey|GradientColorKey|Graphics|Grid|GridBrushBase|FlipAxis|RotationDirection|Tool|GridLayout|CellLayout|CellSwizzle|GUI|GroupScope|ScrollViewScope|ToolbarButtonSize|GUIContent|GUIElement|GUILayer|GUILayout|AreaScope|HorizontalScope|ScrollViewScope|VerticalScope|GUILayoutOption|GUILayoutUtility|GUISettings|GUISkin|GUIStyle|GUIStyleState|GUIText|GUITexture|GUIUtility|Gyroscope|Handheld|Hash128|HingeJoint|HingeJoint2D|HostData|HumanBone|HumanDescription|HumanLimit|HumanPose|HumanPoseHandler|HumanTrait|ImageConversion|Input|Joint|Joint2D|JointAngleLimits2D|JointDrive|JointLimits|JointMotor|JointMotor2D|JointSpring|JointSuspension2D|JointTranslationLimits2D|JsonUtility|Keyframe|LayerMask|LensFlare|Light|LightmapData|LightmapSettings|LightProbeGroup|LightProbeProxyVolume|BoundingBoxMode|ProbePositionMode|RefreshMode|ResolutionMode|LightProbes|LineRenderer|LineUtility|LocationInfo|LocationService|LOD|LODGroup|Logger|MasterServer|MatchTargetWeightMask|Material|MaterialPropertyBlock|Mathf|Matrix4x4|Mesh|MeshCollider|MeshFilter|MeshParticleEmitter|MeshRenderer|Microphone|MonoBehaviour|Motion|MovieTexture|Network|NetworkMessageInfo|NetworkPlayer|NetworkView|NetworkViewID|Object|OcclusionArea|OcclusionPortal|Particle|ParticleAnimator|ParticleCollisionEvent|ParticleEmitter|ParticlePhysicsExtensions|ParticleRenderer|ParticleSystem|Burst|CollisionModule|ColorBySpeedModule|ColorOverLifetimeModule|CustomDataModule|EmissionModule|EmitParams|ExternalForcesModule|ForceOverLifetimeModule|InheritVelocityModule|LightsModule|LimitVelocityOverLifetimeModule|MainModule|MinMaxCurve|MinMaxGradient|NoiseModule|Particle|RotationBySpeedModule|RotationOverLifetimeModule|ShapeModule|SizeBySpeedModule|SizeOverLifetimeModule|SubEmittersModule|TextureSheetAnimationModule|TrailModule|TriggerModule|VelocityOverLifetimeModule|ParticleSystemRenderer|PhysicMaterial|Physics|Physics2D|PhysicsMaterial2D|PhysicsUpdateBehaviour2D|Ping|Plane|PlatformEffector2D|PlayerPrefs|PlayerPrefsException|PointEffector2D|PolygonCollider2D|Pose|ProceduralMaterial|ProceduralPropertyDescription|ProceduralTexture|Projector|PropertyName|QualitySettings|Quaternion|Random|State|RangeInt|Ray|Ray2D|RaycastHit|RaycastHit2D|Rect|RectInt|PositionEnumerator|RectOffset|RectTransform|Axis|Edge|RectTransformUtility|ReflectionProbe|RelativeJoint2D|RemoteSettings|RenderBuffer|Renderer|RendererExtensions|RenderSettings|RenderTargetSetup|RenderTexture|RenderTextureDescriptor|Resolution|ResourceRequest|Resources|Rigidbody|Rigidbody2D|RuntimeAnimatorController|SamsungTV|OpenAPI|GamePadMode|GestureMode|TouchPadMode|Screen|ScreenCapture|ScriptableObject|Security|Shader|ShaderVariantCollection|ShaderVariant|SkeletonBone|SkinnedMeshRenderer|Skybox|SleepTimeout|SliderJoint2D|Social|SoftJointLimit|SoftJointLimitSpring|SortingLayer|SparseTexture|SphereCollider|SplatPrototype|SpringJoint|SpringJoint2D|Sprite|SpriteMask|SpriteRenderer|StateMachineBehaviour|StaticBatchingUtility|SurfaceEffector2D|SystemInfo|TargetJoint2D|Terrain|MaterialType|TerrainCollider|TerrainData|TerrainExtensions|TextAsset|TextGenerationSettings|TextGenerator|TextMesh|Texture|Texture2D|EXRFlags|Texture2DArray|Texture3D|Time|Touch|TouchScreenKeyboard|Status|TrailRenderer|Transform|Tree|TreeInstance|TreePrototype|UICharInfo|UILineInfo|UIVertex|Vector2|Vector2Int|Vector3|Vector3Int|Vector4|WaitForEndOfFrame|WaitForFixedUpdate|WaitForSeconds|WaitForSecondsRealtime|WaitUntil|WaitWhile|WebCamDevice|WebCamTexture|WebGLInput|WheelCollider|WheelFrictionCurve|WheelHit|WheelJoint2D|WindZone|WWW|WWWAudioExtensions|WWWForm|YieldInstruction|ICanvasRaycastFilter|IExposedPropertyTable|ILogger|ILogHandler|ISerializationCallbackReceiver|AdditionalCanvasShaderChannels|AndroidActivityIndicatorStyle|AnimationBlendMode|AnimationCullingType|AnimatorControllerParameterType|AnimatorCullingMode|AnimatorRecorderMode|AnimatorUpdateMode|AnisotropicFiltering|ApplicationInstallMode|ApplicationSandboxType|AudioClipLoadType|AudioCompressionFormat|AudioDataLoadState|AudioReverbPreset|AudioRolloffMode|AudioSourceCurveType|AudioSpeakerMode|AudioType|AudioVelocityUpdateMode|AvatarIKGoal|AvatarIKHint|AvatarMaskBodyPart|AvatarTarget|BatteryStatus|BlendWeights|CameraClearFlags|CameraType|CapsuleDirection2D|ClusterInputType|CollisionDetectionMode|CollisionDetectionMode2D|CollisionFlags|ColorGamut|ColorSpace|ComputeBufferType|ConfigurableJointMotion|ConnectionTesterStatus|CubemapFace|CursorLockMode|CursorMode|CustomRenderTextureInitializationSource|CustomRenderTextureUpdateMode|CustomRenderTextureUpdateZoneSpace|DepthTextureMode|DetailRenderMode|DeviceOrientation|DeviceType|DrivenTransformProperties|EffectorForceMode2D|EffectorSelection2D|EventModifiers|EventType|FFTWindow|FilterMode|FocusType|FogMode|FontStyle|ForceMode|ForceMode2D|FullScreenMovieControlMode|FullScreenMovieScalingMode|GradientMode|HideFlags|HorizontalWrapMode|HumanBodyBones|ImagePosition|IMECompositionMode|JointDriveMode|JointLimitState2D|JointProjectionMode|KeyCode|LightmapBakeType|LightmapsMode|LightmapsModeLegacy|LightRenderMode|LightShadows|LightType|LineAlignment|LineTextureMode|LocationServiceStatus|LODFadeMode|LogType|MasterServerEvent|MaterialGlobalIlluminationFlags|MeshTopology|MotionVectorGenerationMode|NetworkConnectionError|NetworkDisconnection|NetworkLogLevel|NetworkPeerType|NetworkReachability|NetworkStateSynchronization|NPOTSupport|OperatingSystemFamily|ParticleRenderMode|ParticleSystemAnimationMode|ParticleSystemAnimationType|ParticleSystemCollisionMode|ParticleSystemCollisionQuality|ParticleSystemCollisionType|ParticleSystemCurveMode|ParticleSystemCustomData|ParticleSystemCustomDataMode|ParticleSystemEmissionType|ParticleSystemEmitterVelocityMode|ParticleSystemGradientMode|ParticleSystemInheritVelocityMode|ParticleSystemMeshShapeType|ParticleSystemNoiseQuality|ParticleSystemOverlapAction|ParticleSystemRenderMode|ParticleSystemRenderSpace|ParticleSystemScalingMode|ParticleSystemShapeMultiModeValue|ParticleSystemShapeType|ParticleSystemSimulationSpace|ParticleSystemSortMode|ParticleSystemStopAction|ParticleSystemStopBehavior|ParticleSystemSubEmitterProperties|ParticleSystemSubEmitterType|ParticleSystemTrailTextureMode|ParticleSystemTriggerEventType|ParticleSystemVertexStream|ParticleSystemVertexStreams|PhysicMaterialCombine|PlayMode|PrimitiveType|ProceduralCacheSize|ProceduralLoadingBehavior|ProceduralOutputType|ProceduralProcessorUsage|ProceduralPropertyType|QueryTriggerInteraction|QueueMode|RenderingPath|RenderMode|RenderTextureCreationFlags|RenderTextureFormat|RenderTextureMemoryless|RenderTextureReadWrite|RigidbodyConstraints|RigidbodyConstraints2D|RigidbodyInterpolation|RigidbodyInterpolation2D|RigidbodySleepMode2D|RigidbodyType2D|RotationDriveMode|RPCMode|RuntimeInitializeLoadType|RuntimePlatform|ScaleMode|ScreenOrientation|SendMessageOptions|ShadowmaskMode|ShadowProjection|ShadowQuality|ShadowResolution|SkinQuality|Space|SpriteAlignment|SpriteDrawMode|SpriteMaskInteraction|SpriteMeshType|SpritePackingMode|SpritePackingRotation|SpriteTileMode|StackTraceLogType|StereoTargetEyeMask|SystemLanguage|TerrainChangedFlags|TerrainRenderFlags|TextAlignment|TextAnchor|TextClipping|TextureCompressionQuality|TextureFormat|TextureWrapMode|ThreadPriority|TizenActivityIndicatorStyle|TouchPhase|TouchScreenKeyboardType|TouchType|TransparencySortMode|UserAuthorization|VerticalWrapMode|VRTextureUsage|WindZoneMode|WrapMode)\\b",
+      "name": "support.class.unityscript"
+    }, {
+      "match": "\\b(Infinity|NaN|undefined)\\b",
+      "name": "constant.language.unityscript"
+    }, {
+      "begin": "(?<=[\\[=(?:+,!]|^|return|=>|&&|\\|\\|)\\s*(/)(?![/*+{}?])(?=.*/)",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.definition.string.begin.unityscript"
+        }
+      },
+      "end": "(/)[gimuy]*",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.definition.string.end.unityscript"
+        }
+      },
+      "name": "string.regexp.unityscript",
+      "patterns": [
+        {
+          "include": "source.js.regexp"
+        }
+      ]
+    }, {
+      "include": "#operators"
+    }, {
+      "include": "#method_calls"
+    }, {
+      "include": "#function_calls"
+    }, {
+      "include": "#numbers"
+    }, {
+      "include": "#objects"
+    }, {
+      "include": "#properties"
+    }, {
+      "match": "(?<!\\.)\\b([A-Z][A-Z0-9_]+)(?!\\s*:)\\b|(?<=\\?)(?:\\s*)([A-Z][A-Z0-9_]+)(?=\\s*:)",
+      "captures": {
+        "1": {
+          "name": "constant.other.unityscript"
+        },
+        "2": {
+          "name": "constant.other.unityscript"
+        }
+      }
+    }, {
+      "match": "(?<!\\$)\\b[0-9]+[\\w$]*",
+      "name": "invalid.illegal.identifier.unityscript"
+    }, {
+      "match": "\\;",
+      "name": "punctuation.terminator.statement.unityscript"
+    }, {
+      "match": ",",
+      "name": "meta.delimiter.object.comma.unityscript"
+    }, {
+      "match": "\\.",
+      "name": "meta.delimiter.method.period.unityscript"
+    }, {
+      "captures": {
+        "1": {
+          "name": "punctuation.section.scope.begin.unityscript"
+        },
+        "2": {
+          "name": "punctuation.section.scope.end.unityscript"
+        }
+      },
+      "match": "({)(})"
+    }, {
+      "begin": "{",
+      "beginCaptures": {
+        "0": {
+          "name": "meta.brace.curly.unityscript"
+        }
+      },
+      "end": "}",
+      "endCaptures": {
+        "0": {
+          "name": "meta.brace.curly.unityscript"
+        }
+      },
+      "patterns": [
+        {
+          "include": "$self"
+        }
+      ]
+    }, {
+      "begin": "\\(",
+      "beginCaptures": {
+        "0": {
+          "name": "meta.brace.round.unityscript"
+        }
+      },
+      "end": "\\)",
+      "endCaptures": {
+        "0": {
+          "name": "meta.brace.round.unityscript"
+        }
+      },
+      "patterns": [
+        {
+          "include": "$self"
+        }
+      ]
+    }, {
+      "match": "\\[|\\]",
+      "name": "meta.brace.square.unityscript"
+    }
+  ],
+  "repository": {
+    "numbers": {
+      "patterns": [
+        {
+          "match": "\\b(?<!\\$)0(x|X)[0-9a-fA-F]+\\b(?!\\$)",
+          "name": "constant.numeric.hex.unityscript"
+        }, {
+          "match": "\\b(?<!\\$)0(b|B)[01]+\\b(?!\\$)",
+          "name": "constant.numeric.binary.unityscript"
+        }, {
+          "match": "\\b(?<!\\$)0(o|O)?[0-7]+\\b(?!\\$)",
+          "name": "constant.numeric.octal.unityscript"
+        }, {
+          "match": "(?x)\n(?<!\\$)(?:\n(?:\\b[0-9]+(\\.)[0-9]+[eE][+-]?[0-9]+\\b)|(?:\\b[0-9]+(\\.)[eE][+-]?[0-9]+\\b)|(?:\\B(\\.)[0-9]+[eE][+-]?[0-9]+\\b)|(?:\\b[0-9]+[eE][+-]?[0-9]+\\b)|(?:\\b[0-9]+(\\.)[0-9]+\\b)|(?:\\b[0-9]+(\\.)\\B)|(?:\\B(\\.)[0-9]+\\b)|(?:\\b[0-9]+\\b(?!\\.))|(?:\\b[0-9]+[d]+\\b)|(?:\\b[0-9]+(\\.)[0-9]+[d]+\\b)|(?:\\b[0-9]+(\\.)[0-9]+[f]+\\b)|(?:\\b[0-9]+[f]+\\b)\n)(?!\\$)",
+          "captures": {
+            "0": {
+              "name": "constant.numeric.decimal.unityscript"
+            },
+            "1": {
+              "name": "meta.delimiter.decimal.period.unityscript"
+            },
+            "2": {
+              "name": "meta.delimiter.decimal.period.unityscript"
+            },
+            "3": {
+              "name": "meta.delimiter.decimal.period.unityscript"
+            },
+            "4": {
+              "name": "meta.delimiter.decimal.period.unityscript"
+            },
+            "5": {
+              "name": "meta.delimiter.decimal.period.unityscript"
+            },
+            "6": {
+              "name": "meta.delimiter.decimal.period.unityscript"
+            }
+          }
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "match": "%=|\\+=|-=|\\*=|(?<!\\()/=",
+          "name": "keyword.operator.assignment.compound.unityscript"
+        }, {
+          "match": "&=|\\^=|<<=|>>=|>>>=|\\|=",
+          "name": "keyword.operator.assignment.compound.bitwise.unityscript"
+        }, {
+          "match": "!==|!=|<=|>=|===|==|<|>",
+          "name": "keyword.operator.comparison.unityscript"
+        }, {
+          "match": "&&|!|\\|\\|",
+          "name": "keyword.operator.logical.unityscript"
+        }, {
+          "match": "&|\\||\\^|~",
+          "name": "keyword.operator.bitwise.unityscript"
+        }, {
+          "match": "\\?|:",
+          "name": "keyword.operator.unityscript"
+        }, {
+          "match": "=",
+          "name": "keyword.operator.assignment.unityscript"
+        }, {
+          "match": "--",
+          "name": "keyword.operator.decrement.unityscript"
+        }, {
+          "match": "\\+\\+",
+          "name": "keyword.operator.increment.unityscript"
+        }, {
+          "match": "%|\\*|/|-|\\+",
+          "name": "keyword.operator.unityscript"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "begin": "'",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.unityscript"
+            }
+          },
+          "end": "'",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.unityscript"
+            }
+          },
+          "name": "string.quoted.single.unityscript",
+          "patterns": [
+            {
+              "match": "\\\\(x\\h{2}|[0-2][0-7]{0,2}|3[0-6][0-7]?|37[0-7]?|[4-7][0-7]?|.)",
+              "name": "constant.character.escape.unityscript"
+            }, {
+              "match": "[^']*[^\\n\\r'\\\\]$",
+              "name": "invalid.illegal.string.unityscript"
+            }
+          ]
+        }, {
+          "begin": "\"",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.unityscript"
+            }
+          },
+          "end": "\"",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.unityscript"
+            }
+          },
+          "name": "string.quoted.double.unityscript",
+          "patterns": [
+            {
+              "match": "\\\\(x\\h{2}|[0-2][0-7]{0,2}|3[0-6][0-7]|37[0-7]?|[4-7][0-7]?|.)",
+              "name": "constant.character.escape.unityscript"
+            }, {
+              "match": "[^\"]*[^\\n\\r\"\\\\]$",
+              "name": "invalid.illegal.string.unityscript"
+            }
+          ]
+        }
+      ]
+    },
+    "function_params": {
+      "patterns": [
+        {
+          "begin": "\\(",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.parameters.begin.bracket.round.unityscript"
+            }
+          },
+          "end": "\\)",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.parameters.end.bracket.round.unityscript"
+            }
+          },
+          "name": "meta.parameters.unityscript",
+          "patterns": [
+            {
+              "match": "(\\.\\.\\.)([a-zA-Z_$][\\w$]*)",
+              "captures": {
+                "1": {
+                  "name": "keyword.operator.spread.unityscript"
+                },
+                "2": {
+                  "name": "variable.parameter.rest.function.unityscript"
+                }
+              }
+            }, {
+              "include": "$self"
+            }, {
+              "match": "[a-zA-Z_$][\\w$]*",
+              "name": "variable.parameter.function.unityscript"
+            }
+          ]
+        }
+      ]
+    },
+    "function_body": {
+      "patterns": [
+        {
+          "begin": "{",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.function.body.begin.bracket.curly.unityscript"
+            }
+          },
+          "end": "}",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.function.body.end.bracket.curly.unityscript"
+            }
+          },
+          "patterns": [
+            {
+              "include": "$self"
+            }
+          ]
+        }
+      ]
+    },
+    "function_innards": {
+      "patterns": [
+        {
+          "match": "[a-zA-Z_$][\\w$]*(?=\\s*\\()",
+          "name": "entity.name.function.unityscript"
+        }, {
+          "include": "#function_params"
+        }, {
+          "include": "#comments"
+        }
+      ]
+    },
+    "arguments": {
+      "patterns": [
+        {
+          "begin": "\\(",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.arguments.begin.bracket.round.unityscript"
+            }
+          },
+          "end": "\\)",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.arguments.end.bracket.round.unityscript"
+            }
+          },
+          "name": "meta.arguments.unityscript",
+          "patterns": [
+            {
+              "include": "$self"
+            }
+          ]
+        }
+      ]
+    },
+    "method_calls": {
+      "patterns": [
+        {
+          "begin": "(\\.)\\s*([\\w$]+)\\s*(?=\\()",
+          "beginCaptures": {
+            "1": {
+              "name": "meta.delimiter.method.period.unityscript"
+            },
+            "2": {
+              "patterns": [
+                {
+                  "match": "(?x)\n\\bon(Debug|Instantiate|InvokeRepeating)\\b",
+                  "name": "support.function.methodcalls.unityscript"
+                }, {
+                  "match": "(?x)\n\\b(Find)\\b",
+                  "name": "support.function.unityscript"
+                }, {
+                  "match": "[a-zA-Z_$][\\w$]*",
+                  "name": "entity.name.function.unityscript"
+                }, {
+                  "match": "\\d[\\w$]*",
+                  "name": "invalid.illegal.identifier.unityscript"
+                }
+              ]
+            }
+          },
+          "end": "(?<=\\))",
+          "name": "meta.method-call.unityscript",
+          "patterns": [
+            {
+              "include": "#arguments"
+            }
+          ]
+        }
+      ]
+    },
+    "function_calls": {
+      "patterns": [
+        {
+          "begin": "([\\w$]+)\\s*(?=\\()",
+          "beginCaptures": {
+            "1": {
+              "patterns": [
+                {
+                  "match": "(?x)\n\\b(isNaN|isFinite|eval|uneval|parseInt|parseFloat|decodeURI|\ndecodeURIComponent|encodeURI|encodeURIComponent|escape|unescape|\nrequire|set(Interval|Timeout)|clear(Interval|Timeout))\\b",
+                  "name": "support.function.unityscript"
+                }, {
+                  "match": "[a-zA-Z_$][\\w$]*",
+                  "name": "entity.name.function.unityscript"
+                }, {
+                  "match": "\\d[\\w$]*",
+                  "name": "invalid.illegal.identifier.unityscript"
+                }
+              ]
+            }
+          },
+          "end": "(?<=\\))",
+          "name": "meta.function-call.unityscript",
+          "patterns": [
+            {
+              "include": "#arguments"
+            }
+          ]
+        }
+      ]
+    },
+    "objects": {
+      "patterns": [
+        {
+          "match": "[A-Z][A-Z0-9_$]*(?=\\s*\\.\\s*[a-zA-Z_$]\\w*)",
+          "name": "constant.other.object.unityscript"
+        }, {
+          "match": "[a-zA-Z_$][\\w$]*(?=\\s*\\.\\s*[a-zA-Z_$]\\w*)",
+          "name": "variable.other.object.unityscript"
+        }
+      ]
+    },
+    "properties": {
+      "patterns": [
+        {
+          "match": "(\\.)\\s*([A-Z][A-Z0-9_$]*\\b\\$*)(?=\\s*\\.\\s*[a-zA-Z_$]\\w*)",
+          "captures": {
+            "1": {
+              "name": "meta.delimiter.property.period.unityscript"
+            },
+            "2": {
+              "name": "constant.other.object.property.unityscript"
+            }
+          }
+        }, {
+          "match": "(\\.)\\s*(\\$*[a-zA-Z_$][\\w$]*)(?=\\s*\\.\\s*[a-zA-Z_$]\\w*)",
+          "captures": {
+            "1": {
+              "name": "meta.delimiter.property.period.unityscript"
+            },
+            "2": {
+              "name": "variable.other.object.property.unityscript"
+            }
+          }
+        }, {
+          "match": "(\\.)\\s*([A-Z][A-Z0-9_$]*\\b\\$*)",
+          "captures": {
+            "1": {
+              "name": "meta.delimiter.property.period.unityscript"
+            },
+            "2": {
+              "name": "constant.other.property.unityscript"
+            }
+          }
+        }, {
+          "match": "(\\.)\\s*(\\$*[a-zA-Z_$][\\w$]*)",
+          "captures": {
+            "1": {
+              "name": "meta.delimiter.property.period.unityscript"
+            },
+            "2": {
+              "name": "variable.other.property.unityscript"
+            }
+          }
+        }, {
+          "match": "(\\.)\\s*([0-9][\\w$]*)",
+          "captures": {
+            "1": {
+              "name": "meta.delimiter.property.period.unityscript"
+            },
+            "2": {
+              "name": "invalid.illegal.identifier.unityscript"
+            }
+          }
+        }
+      ]
+    },
+    "comments": {
+      "patterns": [
+        {
+          "begin": "/\\*\\*(?!/)",
+          "captures": {
+            "0": {
+              "name": "punctuation.definition.comment.unityscript"
+            }
+          },
+          "end": "\\*/",
+          "name": "comment.block.documentation.unityscript"
+        }, {
+          "begin": "/\\*",
+          "captures": {
+            "0": {
+              "name": "punctuation.definition.comment.unityscript"
+            }
+          },
+          "end": "\\*/",
+          "name": "comment.block.unityscript"
+        }, {
+          "begin": "(^[ \\t]+)?(?=//)",
+          "beginCaptures": {
+            "1": {
+              "name": "punctuation.whitespace.comment.leading.unityscript"
+            }
+          },
+          "end": "(?!\\G)",
+          "patterns": [
+            {
+              "begin": "//",
+              "beginCaptures": {
+                "0": {
+                  "name": "punctuation.definition.comment.unityscript"
+                }
+              },
+              "end": "\\n",
+              "name": "comment.line.double-slash.unityscript"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
